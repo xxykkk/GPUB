@@ -5,7 +5,10 @@
 *.cubin
 *.fatbin
 
-
+# nsys report
 *.nsys-rep
 *.sqlite
 *.db
+
+# executable file
+*gemm

@@ -3,7 +3,7 @@
 #include <mma.h>
 #include <chrono>
 
-#define N 1024  // 假设矩阵大小是 1024x1024
+#define N 4096  // 假设矩阵大小是 1024x1024
 
 using namespace nvcuda;
 
@@ -84,7 +84,8 @@ int main() {
     cudaEventCreate(&stop);
     cudaEventRecord(start);
 
-    for (int i = 0; i < 10000; i++) {
+    int times = 1000;
+    for (int i = 0; i < times; i++) {
         tensorCoreMatrixMultiplyAdd_TF32<<<numBlocks, threadsPerBlock>>>(d_A, d_B, d_C, d_D, N);
     }
     
@@ -93,7 +94,7 @@ int main() {
     
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
-    std::cout << "Time for 10000 iterations: (TF32 Tensor Core) " << milliseconds / 1000 << " s" << std::endl;
+    std::cout << "Time for " << times << " iterations: (TF32 Tensor Core) " << milliseconds / 1000 << " s" << std::endl;
 
     cudaMemcpy(D, d_D, size, cudaMemcpyDeviceToHost);
     std::cout << "D[0][0] = " << D[0] << " (Expected: 2051)" << std::endl;

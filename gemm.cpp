@@ -37,7 +37,8 @@ int main() {
     clock_t startCPU = clock();
 
     // 执行 CPU 矩阵乘法 1000 次
-    for (int i = 0; i < 10; i++) {
+    int times = 10;
+    for (int i = 0; i < times; i++) {
         matrixMultiplyCPU(A, B, C, D, N);
     }
 
@@ -46,7 +47,8 @@ int main() {
     double cpu_time = (double)(endCPU - startCPU) / CLOCKS_PER_SEC;
 
     // 输出 CPU 执行时间
-    std::cout << "CPU time for 1000 iterations: " << cpu_time << " s" << std::endl;
+    std::cout << "CPU time for " << times << " iterations: " << cpu_time << " s" << std::endl;
+    std::cout << "D[0,0]: = " << D[0] << std::endl;
 
     // 释放内存
     free(A);
