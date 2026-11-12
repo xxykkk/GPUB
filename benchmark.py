@@ -1,9 +1,13 @@
 from __future__ import print_function
 
 import os, sys
-os.environ['NO_TENSOR_OPS'] = '1'
-os.environ['CUBLAS_LT_DISABLE_TENSOR_CORES'] = '1'
-os.environ['CUBLAS_POLICY_ALLOW_TENSOR_CORES'] = '0'
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
+# os.environ['NO_TENSOR_OPS'] = '1'
+# os.environ['CUBLAS_LT_DISABLE_TENSOR_CORES'] = '1'
+# os.environ['CUBLAS_POLICY_ALLOW_TENSOR_CORES'] = '0'
 
 
 import argparse
@@ -15,6 +19,7 @@ import torch.utils.data.distributed
 from torchvision import models
 import timeit
 import numpy as np
+import time as timee
 
 import sys
 import torch
@@ -23,8 +28,8 @@ print("PyTorch version:", torch.__version__)
 
 scaler = torch.amp.GradScaler('cuda')
 
-torch.backends.cuda.matmul.allow_tf32 = False
-torch.backends.cudnn.allow_tf32 = False
+# torch.backends.cuda.matmul.allow_tf32 = False
+# torch.backends.cudnn.allow_tf32 = False
 
 # Benchmark settings
 parser = argparse.ArgumentParser(description='PyTorch Synthetic Benchmark with single GPU',
@@ -43,7 +48,7 @@ parser.add_argument('--num-warmup-batches', type=int, default=10,
                     help='number of warm-up batches that don\'t count towards benchmark')
 parser.add_argument('--num-batches-per-iter', type=int, default=10,
                     help='number of batches per benchmark iteration')
-parser.add_argument('--num-iters', type=int, default=20, # modify
+parser.add_argument('--num-iters', type=int, default=200000, # modify
                     help='number of benchmark iterations')
 parser.add_argument('--num-classes', type=int, default=1000,
                     help='number of classes')
@@ -56,7 +61,7 @@ parser.add_argument('--profiler', action='store_true', default=False,
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
-cudnn.benchmark = True
+# cudnn.benchmark = True
 
 # Set up standard model.
 model = getattr(models, args.model)(num_classes=args.num_classes)
@@ -122,6 +127,7 @@ with torch.autograd.profiler.profile(enabled=enable_profiling, use_cuda=True) as
         img_sec = args.batch_size * args.num_batches_per_iter / time
         log('Iter #%d: %.1f img/sec per %s' % (x, img_sec, device))
         img_secs.append(img_sec)
+        timee.sleep(1) # 添加了休眠
 
 
 # Results
