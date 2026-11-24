@@ -57,6 +57,8 @@ parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--profiler', action='store_true', default=False,
                     help='disables profiler')
+parser.add_argument('--sleep', type=float, default=None,
+                    help='sleep time between iterations')
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -127,8 +129,8 @@ with torch.autograd.profiler.profile(enabled=enable_profiling, use_cuda=True) as
         img_sec = args.batch_size * args.num_batches_per_iter / time
         log('Iter #%d: %.1f img/sec per %s' % (x, img_sec, device))
         img_secs.append(img_sec)
-        timee.sleep(1) # 添加了休眠
-
+        if args.sleep is not None:
+            timee.sleep(args.sleep)
 
 # Results
 img_sec_mean = np.mean(img_secs)
